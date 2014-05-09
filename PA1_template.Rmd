@@ -26,9 +26,8 @@ totalSteps <- aggregate(Data$steps, list(Date = Data$date), sum)
 totalSteps <- totalSteps[complete.cases(totalSteps),]
 mean_tot <- mean(totalSteps[,c("x")],na.rm=TRUE)
 median_tot <- median(totalSteps[,c("x")],na.rm=TRUE)
-hist(totalSteps$x, col="lightblue", xlab= "Total DaIly Steps", ylab= "Frequency", main="", breaks=20)
+hist(totalSteps$x, col="lightblue", xlab= "Total Daily Steps", ylab= "Frequency", main="Histogram of the Total Number of Steps Taken per Day", breaks=20)
 ```
-
 **Fig. 1: Histogram of the total number of steps taken each day.**
 
 The mean and median of total number of steps taken per day are `r mean_tot` and `r median_tot` respectively.
@@ -41,10 +40,10 @@ averageSteps <- averageSteps[complete.cases(averageSteps),]
 average <- aggregate(averageSteps$x, list(Interval = averageSteps$Interval), mean)
 interval <- average[which.max(average$x), ]
 interval <- interval$Interval
-plot(average$Interval, average$x, type = "l", col="blue", xlab = "Interval", ylab = "Mean number of steps", main="")
+plot(average$Interval, average$x, type = "l", col="blue", xlab = "Interval", ylab = "Mean number of steps", main="Average number of steps taken per 5-min interval")
 ```
+**Fig. 2: Time series plot of the average number of steps taken per 5-minute interval, averaged across all days.**
 
-**Fig. 2: Average number of steps taken per 5-min interval.**
 The five minute interval with the highest average number of steps taken is `r interval`.
 
 ## Imputing missing values
@@ -54,6 +53,8 @@ no_NAs <- nrow(Data[is.na(Data$steps), ])
 ```
 
 The total number of missing values in the dataset (i.e. the total number of rows with NAs) is `r no_NAs`.
+
+I have decided to replace the missing no. of steps with the average no. of steps, per interval. For this, I created a blank dataframe, to which I bound each row of the original dataframe after replacing the steps which have value NA with the average steps value taken from the vector which was calculated in the previous stage.
 
 ```{r inserting other values in place of NAs, echo=TRUE}
 newData <- data.frame(steps=as.numeric(integer()), date=as.Date(character()), interval=as.numeric(integer()),stringsAsFactors=FALSE)
@@ -76,9 +77,8 @@ new_totalSteps <- aggregate(newData$steps, list(Date = newData$date), sum)
 new_totalSteps <- new_totalSteps[complete.cases(new_totalSteps),]
 new_mean_tot <- mean(new_totalSteps[ , c("x")],na.rm=TRUE)
 new_median_tot <- median(new_totalSteps[ , c("x")],na.rm=TRUE)
-hist(new_totalSteps$x, col="lightblue", xlab= "Total DaIly Steps", ylab= "Frequency", main="", breaks=20)
+hist(new_totalSteps$x, col="lightblue", xlab= "Total Daily Steps", ylab= "Frequency", main="Histogram of the Total Number of Steps Taken per Day using new Data", breaks=20)
 ```
-
 **Fig. 3: Histogram of the total number of steps taken each day using new activity data.**
 
 The mean and median of total number of steps taken per day are `r new_mean_tot` and `r new_median_tot` respectively using new activity data.
@@ -108,5 +108,4 @@ newData <- cbind(newData, day)
 daySteps <- ddply(newData, c("interval", "day"), function(x) apply(x[1], 2, mean))
 xyplot(daySteps$steps ~ daySteps$interval | daySteps$day, type = "l", ylab = "Number of Steps", xlab = "Interval", layout = c(1, 2))
 ```
-
 **Fig. 4: Average number of steps taken per 5 minute interval for weekdays and weekends.**
